@@ -1,32 +1,20 @@
-from flask import Flask, request, jsonify
-import datetime
+from fastapi import FastAPI
+from datetime import datetime
+import pytz
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route('/api', methods=['GET'])
-def get_info():
-    # Get query parameters
-    slack_name = request.args.get('slack_name')
-    track = request.args.get('track')
-
-    # Get current day of the week
-    current_day = datetime.datetime.now().strftime('%A')
-
-    # Get current UTC time with +/-2 minute validation
-    current_time = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-
-    # Construct response JSON
-    response = {
+@app.get("/api")
+def home(slack_name:str = "Pamode", track:str = "backend"):
+    now = datetime.now(pytz.UTC)
+    utc_time = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    current_day = now.strftime("%A")
+    return {
         "slack_name": slack_name,
         "current_day": current_day,
-        "utc_time": current_time,
+        "utc_time": utc_time,
         "track": track,
         "github_file_url": "https://github.com/Adebayo-Shallom/shallomcodes.github.io/blob/main/endpoint/endpoint/app.py",
         "github_repo_url": "https://github.com/Adebayo-Shallom/shallomcodes.github.io",
         "status_code": 200
     }
-
-    return jsonify(response)
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
